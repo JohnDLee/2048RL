@@ -13,6 +13,7 @@ class BACKEND_2048():
         self.state = np.zeros((4, 4), dtype=int)
         self.num_vals = 0
         self.score = 0
+        self.num_operations = 0
         self.init_game()
         
     def get_state(self):
@@ -81,6 +82,7 @@ class BACKEND_2048():
         stacked = self.stack_left()
         if not self.compress_left() and not stacked: return self.INVALID
         self.stack_left()
+        self.num_operations += 1
         self.spawn_tile()
         if self.check_game_over(): return self.GAME_OVER
         return self.SUCCESS
@@ -104,6 +106,7 @@ class BACKEND_2048():
         if not self.compress_left() and not stacked: 
             self.reverse()
             return self.INVALID
+        self.num_operations += 1
         self.stack_left()
         self.reverse()
         self.spawn_tile()
@@ -118,6 +121,7 @@ class BACKEND_2048():
         if not self.compress_left() and not stacked:
             self.transpose()
             return self.INVALID
+        self.num_operations += 1
         self.stack_left()
         self.transpose()
         self.spawn_tile()
@@ -134,6 +138,7 @@ class BACKEND_2048():
             self.reverse()
             self.transpose()
             return self.INVALID
+        self.num_operations += 1
         self.stack_left()
         self.reverse()
         self.transpose()
