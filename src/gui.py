@@ -1,7 +1,7 @@
 # File: gui.py
 # File Created: Friday, 10th February 2023 2:48:41 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Saturday, 11th February 2023 12:24:50 am
+# Last Modified: Monday, 13th March 2023 12:59:01 am
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Contains GUI Class for 2048 in python
@@ -12,8 +12,14 @@ from collections import defaultdict
 from .backend import BACKEND_2048
 
 
+
 class GAME_2048(tk.Frame):
     """2048 Game"""
+    
+    
+    INVALID_MOVE = 0
+    SUCCESSFUL_MOVE = 1
+    GAME_OVER = 2
     
     ###############
     # Color Codes #
@@ -82,7 +88,7 @@ class GAME_2048(tk.Frame):
 
         self._setup_colors()
         
-    
+        
         # grid setup
         self.grid()
         self.master.title("2048")
@@ -91,7 +97,26 @@ class GAME_2048(tk.Frame):
             self, bg=GAME_2048.Color_grid, bd=3, width=600, height=600
         )
         self.grid_main.grid(pady=(110,0))
-
+        
+        # game over frame
+        self.game_over_frame = None
+        self.label_score = None
+        self.cells = []
+        
+        self.reset_game()
+        
+    def reset_game(self):
+        if self.game_over_frame:
+            self.game_over_frame.destroy()
+            
+        if self.label_score:
+            self.label_score.destroy()
+            
+        if len(self.cells) != 0:
+            for row in self.cells:
+                for cell_data in row:
+                    cell_data['frame'].destroy()
+            
         # create gui
         self.GUI_maker()
         
@@ -99,6 +124,7 @@ class GAME_2048(tk.Frame):
         self.backend = BACKEND_2048()
         self.GUI_update()
         
+    def run_interactive_game(self):
         # bind controls.
         self.master.bind("<Left>", self.left)
         self.master.bind("<Right>", self.right)
@@ -159,12 +185,14 @@ class GAME_2048(tk.Frame):
         ).grid(row=0)
         self.label_score = tk.Label(frame_score, text="0", font= GAME_2048.Font_Score)
         self.label_score.grid(row=1)
+        
+        
 
     def left(self, event):
         """Left op"""
         stacked = self.backend.stack_left()
         if not self.backend.compress_left() and not stacked:
-            return
+            return self.INVALID_MOVE
         self.backend.stack_left()
         # spawn a new tile
         self.backend.spawn_tile()
@@ -173,6 +201,8 @@ class GAME_2048(tk.Frame):
         # check game over
         if self.backend.check_game_over():
             self.game_over()
+            return self.GAME_OVER
+        return self.SUCCESSFUL_MOVE
             
     def right(self, event):
         """Right op"""
@@ -181,7 +211,7 @@ class GAME_2048(tk.Frame):
         stacked = self.backend.stack_left()
         if not self.backend.compress_left() and not stacked:
             self.backend.reverse()
-            return
+            return self.INVALID_MOVE
         self.backend.stack_left()
         self.backend.reverse()
         # spawn tile
@@ -191,6 +221,8 @@ class GAME_2048(tk.Frame):
         # check game over
         if self.backend.check_game_over():
             self.game_over()
+            return self.GAME_OVER
+        return self.SUCCESSFUL_MOVE
         
     def up(self, event):
         """Up op"""
@@ -199,7 +231,7 @@ class GAME_2048(tk.Frame):
         stacked = self.backend.stack_left()
         if not self.backend.compress_left() and not stacked:
             self.backend.transpose()
-            return
+            return self.INVALID_MOVE
         self.backend.stack_left()
         self.backend.transpose()
         # spawn tile
@@ -209,6 +241,8 @@ class GAME_2048(tk.Frame):
         # check Game over
         if self.backend.check_game_over():
             self.game_over() 
+            return self.GAME_OVER
+        return self.SUCCESSFUL_MOVE
             
     def down(self, event):
         """Down op"""
@@ -219,7 +253,7 @@ class GAME_2048(tk.Frame):
         if not self.backend.compress_left() and not stacked:
             self.backend.reverse()
             self.backend.transpose()
-            return
+            return self.INVALID_MOVE
         self.backend.stack_left()
         self.backend.reverse()
         self.backend.transpose()
@@ -229,20 +263,25 @@ class GAME_2048(tk.Frame):
         # update gui
         self.GUI_update()
         # check game over
-        if self.backend.check_game_over(): self.game_over() 
+        if self.backend.check_game_over(): 
+            self.game_over() 
+            return self.GAME_OVER
+        return self.SUCCESSFUL_MOVE
     
     
     def game_over(self):
         """Game over GUI"""
-        game_over_frame = tk.Frame(self.grid_main, borderwidth=2)
-        game_over_frame.place(relx=0.5, rely= 0.5, anchor="center")
+        self.game_over_frame = tk.Frame(self.grid_main, borderwidth=2)
+        self.game_over_frame.place(relx=0.5, rely= 0.5, anchor="center")
         tk.Label(
-            game_over_frame,
+            self.game_over_frame,
             text = "GAME OVER!!",
             bg=GAME_2048.Loser_BG,
             fg=GAME_2048.Font_Color_GameOver,
             font=GAME_2048.Font_GameOver
         ).pack()
+
+        self.GUI_update()
     
     def GUI_update(self):
         """Updates the GUI

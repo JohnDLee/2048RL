@@ -1,3 +1,11 @@
+# File: backend.py
+# File Created: Friday, 10th February 2023 2:48:38 pm
+# Author: John Lee (jlee88@nd.edu)
+# Last Modified: Monday, 13th March 2023 12:47:55 am
+# Modified By: John Lee (jlee88@nd.edu>)
+# 
+# Description: Backend for the 2048 game for quick interactions in RL
+
 import numpy as np
 
 class BACKEND_2048():
@@ -10,16 +18,17 @@ class BACKEND_2048():
     
     
     def __init__(self) -> None:
-        self.state = np.zeros((4, 4), dtype=int)
-        self.num_vals = 0
-        self.score = 0
-        self.num_operations = 0
         self.init_game()
         
     def get_state(self):
         """Gets state
         """
         return self.state
+    
+    def get_last_reward(self):
+        """Gets reward from last movement.
+        """
+        return self.last_reward
 
     def get_score(self):
         """Gets score"""
@@ -28,9 +37,13 @@ class BACKEND_2048():
     def init_game(self):
         """Initialize state w/ random 2's
         """
+        self.state = np.zeros((4, 4), dtype=int)
+        self.num_vals = 0
+        self.score = 0
+        self.num_operations = 0
+        self.last_reward = 0
         self.spawn_tile()
         self.spawn_tile()
-    
     
     def spawn_tile(self):
         """Spawns a tile in an empty location
@@ -64,6 +77,7 @@ class BACKEND_2048():
         """Compresses duplicates"""
         # compress items.
         compressed = 0
+        self.last_reward = 0
         for i in range(3):
             idxs = np.where(self.state[:,i]==self.state[:,i+1])[0]
             non_zeros = np.where(self.state[idxs, i] != 0)[0]
@@ -71,9 +85,10 @@ class BACKEND_2048():
                 continue
             self.state[idxs, i] *= 2
             self.state[idxs, i+1] = 0
-            self.score += self.state[idxs, i].sum()
+            self.last_reward += self.state[idxs, i].sum()
             self.num_vals -= len(non_zeros)
             compressed = True
+        self.score += self.last_reward
         # if somewhere was compressed, return True
         return compressed
 

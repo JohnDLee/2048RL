@@ -11,3 +11,7 @@ To run the code, complete the following steps:
 4. Run `pip install -e "."` to install the package.
 5. Run the interactive 2048 game using `python3 scripts/interactive_game.py`
 6. Test the backend program using `python3 -m src.backend`
+
+### Solution 1 - Simple MLP
+
+See here [/RL/SOLUTION1.md]
