@@ -18,15 +18,16 @@ class ENV2048():
         return np.random.randint(4) # 0 - 3
     
     def step(self, action):
-        ''' takes an action '''
+        ''' takes an action,
+        returns (next_state, reward, game_over)'''
         state = self.actions[action](None) # get state ccorresponding to action
         
         if state == self.game.SUCCESSFUL_MOVE:
-            return (self.game.backend.get_state(), self.game.backend.get_last_reward(), False)
+            return (self.game.backend.get_state(), self.game.backend.get_last_reward(), False, state)
         if state == self.game.INVALID_MOVE:
-            return (self.game.backend.get_state(), -np.infty, False)
+            return (self.game.backend.get_state(), -self.game.backend.get_last_reward(), False, state)
         elif state == self.game.GAME_OVER:
-            return (self.game.backend.get_state(), self.game.backend.get_last_reward(), True)
+            return (self.game.backend.get_state(), self.game.backend.get_last_reward(), True, state)
     
     def get_state(self):
         return self.game.backend.get_state()
@@ -35,4 +36,5 @@ class ENV2048():
     def reset(self):
         '''Reset the game'''
         self.game.reset_game()
+        return self.game.backend.get_state()
     
