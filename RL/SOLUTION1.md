@@ -40,5 +40,12 @@ The final run can be accomplished by running `python scripts/simpleDQN_game.py` 
 
 ## Improvement
 
+There are many areas that could be considered for improvement.
+First, we might check wheter a convolutional neural network works better. It may or may not, since the weights being multiplied are essentially the same, but it might add a bit of positional relevance.
+
+A more drastic option is to change away from a DQN training method, perhaps using double DQN or Dueling DQNs. Another option is to evaluate the reward of every possible move from a certain state, even perhaps using a Monte Carlo simulation to model the probabilistic nature of new 2/4 blocks.
+
+Lastly, we will train the model for a much longer time and observe whether the results improve even more.
+
 
 
