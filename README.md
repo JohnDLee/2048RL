@@ -18,4 +18,4 @@ To run the code, complete the following steps:
 
 ### Solution 1 - Deep DQN using an MLP
 
-See here [/RL/SOLUTION1.md]
+See here[/RL/SOLUTION1.md]
