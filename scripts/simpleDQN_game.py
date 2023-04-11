@@ -1,7 +1,7 @@
 # File: simplemlp_game.py
 # File Created: Friday, 10th March 2023 10:16:19 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Monday, 10th April 2023 8:59:37 pm
+# Last Modified: Monday, 10th April 2023 11:53:08 pm
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Plays a game using a trained SimpleMLP model
@@ -12,7 +12,7 @@ import torch
 import time
 from src.agent_interaction import ENV2048
 
-sys.append('..')
+sys.path.append('..')
 from RL.training_simple import SimpleDQN
 
 
@@ -35,14 +35,28 @@ if __name__ == '__main__':
     state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
     
     with torch.no_grad():
+        random = False
         while True:
             time.sleep(.1)
             # get action
-            action = model(state).argmax()
-            state, reward, terminated, info = env.step(action.item())
+            
+            if random:
+                # Random move if previous was an invalid move
+                state, reward, terminated, info = env.step(env.random_action())
+                random = False
+            else:
+                # Use best move
+                scores = model(state)
+                action = scores.argmax()
+                state, reward, terminated, info = env.step(action.item())
+            
+            
+            if info == env.game.INVALID_MOVE:
+                random = True
             
             if terminated:
                 # loop forever untill killed
+                env.game.game_over()
                 while True:
                     pass 
             else:
