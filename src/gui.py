@@ -1,7 +1,7 @@
 # File: gui.py
 # File Created: Friday, 10th February 2023 2:48:41 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Monday, 13th March 2023 12:59:01 am
+# Last Modified: Monday, 10th April 2023 10:15:39 pm
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Contains GUI Class for 2048 in python
@@ -17,9 +17,9 @@ class GAME_2048(tk.Frame):
     """2048 Game"""
     
     
-    INVALID_MOVE = 0
-    SUCCESSFUL_MOVE = 1
-    GAME_OVER = 2
+    SUCCESSFUL_MOVE=0
+    INVALID_MOVE=1
+    GAME_OVER=2
     
     ###############
     # Color Codes #

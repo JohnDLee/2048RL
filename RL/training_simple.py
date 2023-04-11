@@ -1,7 +1,7 @@
 # File: training_simple.py
 # File Created: Friday, 10th March 2023 10:24:44 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Saturday, 1st April 2023 4:28:55 pm
+# Last Modified: Monday, 10th April 2023 10:30:59 pm
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Training script for a simple DQN, repurposed from https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
@@ -47,7 +47,7 @@ class SimpleDQN(nn.Module):
                                    self.relu,
                                    nn.Linear(512, 256),
                                    self.relu,
-                                   nn.Linear(256, output_neurons)) #! Fill this out...
+                                   nn.Linear(256, output_neurons, bias = False)) #! Fill this out...
         
         
     def forward(self, x):
@@ -99,9 +99,7 @@ class TrainDQN():
             with torch.no_grad():
                 
                 #! Not sure if this is correct.
-                # t.max(1) will return the largest column value of each row.
-                # second column on max result is index of where max element was
-                # found, so we pick action with the larger expected reward.
+                # found, so we pick action with the largest expected reward.
                 return self.policy_model(state).argmax().view(1,1)
         # if you choose random
         else:
@@ -131,10 +129,22 @@ class TrainDQN():
         action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward)
         
+        # print("state:", state_batch)
+        # print("action_batch:", action_batch)
+        # print("reward_batch:", reward_batch)
+        # print("non_final_next_states", non_final_next_states)
+  
         # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
         # columns of actions taken. These are the actions which would've been taken
         # for each batch state according to policy_net
+        # print(self.policy_model(state_batch))
+        # print(action_batch)
         state_action_values = self.policy_model(state_batch).gather(1, action_batch)
+        # above is the predicted reward 
+        #m = torch.where(state_action_values < 0)[0]
+        #print("predicted reward", (state_batch[m], action_batch[m], state_action_values[m]))
+        
+    
 
         # Compute V(s_{t+1}) for all next states.
         # Expected values of actions for non_final_next_states are computed based
@@ -146,6 +156,8 @@ class TrainDQN():
             next_state_values[non_final_mask] = self.target_model(non_final_next_states).max(1)[0]
         # Compute the expected Q values
         expected_state_action_values = (next_state_values * self.GAMMA) + reward_batch
+       
+        #print(state_action_values, expected_state_action_values)
 
         # Compute Huber loss
 
@@ -165,11 +177,10 @@ class TrainDQN():
             # flatten as torch tensor to allow as input.
             state = torch.tensor(state, dtype=torch.float32, device=self.device).unsqueeze(0)
 
-            total_score = 0
             for t in count():
+                print(state)
                 action = self.select_action(state)
                 observation, reward, terminated, info = self.game_env.step(action.item())
-                total_score += reward
                 reward = torch.tensor([reward], device=self.device)
                 
 
@@ -189,15 +200,14 @@ class TrainDQN():
 
                 # Soft update of the target network's weights
                 # θ′ ← τ θ + (1 −τ )θ′
-                if self.steps_completed % 1000:
-                    target_model_state_dict = self.target_model.state_dict()
-                    policy_model_state_dict = self.policy_model.state_dict()
-                    for key in policy_model_state_dict:
-                        target_model_state_dict[key] = policy_model_state_dict[key]*self.TAU + target_model_state_dict[key]*(1-self.TAU)
-                    self.target_model.load_state_dict(target_model_state_dict)
+                target_model_state_dict = self.target_model.state_dict()
+                policy_model_state_dict = self.policy_model.state_dict()
+                for key in policy_model_state_dict:
+                    target_model_state_dict[key] = policy_model_state_dict[key]*self.TAU + target_model_state_dict[key]*(1-self.TAU)
+                self.target_model.load_state_dict(target_model_state_dict)
 
                 if terminated:
-                    self.episode_durations.append(total_score)
+                    self.episode_durations.append(self.game_env.backend.get_score())
                     self.fig, self.ax = self.plot_durations(self.fig, self.ax, False)
                     break
         
@@ -256,7 +266,7 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     ## GAME ENVIRONMENT
-    game_env = ENV2048()
+    game_env = ENV2048(gui = False)
     
     ## GAME OPTIONS/STATE
     # get number of actions and state size
@@ -268,11 +278,11 @@ def main():
 
 
     ## OPTIMIZER/MEMORY/LOSS
-    LR = 1e-4 # LR of optimizer
-    optimizer = optim.AdamW(model.parameters(),
+    LR =2.5e-4 # LR of optimizer
+    optimizer = optim.Adam(model.parameters(),
                             lr=LR,
-                            amsgrad=True)
-    loss_fn = nn.SmoothL1Loss()
+                            )
+    loss_fn = nn.HuberLoss()
     
     ## TRAINER
     # use default hyperparams
@@ -297,3 +307,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    while True:
+        pass

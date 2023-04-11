@@ -1,13 +1,22 @@
 
 from src.gui import GAME_2048
+from src.backend import BACKEND_2048
 import numpy as np
 
 class ENV2048():
     
-    def __init__(self):
+    def __init__(self, gui = True):
         # start a game
-        self.game = GAME_2048()
+        self.gui = gui
+        if self.gui:
+            self.game = GAME_2048()
+            self.backend = self.game.backend
+        else:
+            self.game = BACKEND_2048()
+            self.backend = self.game
+        
         self.actions = [self.game.left, self.game.up, self.game.right, self.game.down]
+        
         
     def num_actions(self):
         ''' gives the total number of actions possible '''
@@ -23,18 +32,26 @@ class ENV2048():
         state = self.actions[action](None) # get state ccorresponding to action
         
         if state == self.game.SUCCESSFUL_MOVE:
-            return (self.game.backend.get_state(), self.game.backend.get_last_reward(), False, state)
+            return (self.backend.get_state(), self.backend.get_last_reward(), False, state)
         if state == self.game.INVALID_MOVE:
-            return (self.game.backend.get_state(), -self.game.backend.get_last_reward(), False, state)
+            return (self.backend.get_state(), -512, False, state)
         elif state == self.game.GAME_OVER:
-            return (self.game.backend.get_state(), self.game.backend.get_last_reward(), True, state)
+            return (self.backend.get_state(), self.backend.get_last_reward(), True, state)
     
     def get_state(self):
-        return self.game.backend.get_state()
+        return self.backend.get_state()
     
     
     def reset(self):
         '''Reset the game'''
-        self.game.reset_game()
-        return self.game.backend.get_state()
+        if self.gui:
+            self.game.reset_game()
+        else:
+            del self.game
+            self.game = BACKEND_2048()
+            self.backend = self.game
+            self.actions = [self.game.left, self.game.up, self.game.right, self.game.down]
+            
+        return self.backend.get_state()
     
+  

@@ -1,7 +1,7 @@
 # File: backend.py
 # File Created: Friday, 10th February 2023 2:48:38 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Monday, 13th March 2023 12:47:55 am
+# Last Modified: Monday, 10th April 2023 10:28:55 pm
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Backend for the 2048 game for quick interactions in RL
@@ -11,8 +11,8 @@ import numpy as np
 class BACKEND_2048():
     """Backend for 2048 game
     """
-    SUCCESS=0
-    INVALID=1
+    SUCCESSFUL_MOVE=0
+    INVALID_MOVE=1
     GAME_OVER=2
     
     
@@ -33,6 +33,9 @@ class BACKEND_2048():
     def get_score(self):
         """Gets score"""
         return self.score
+    
+    def get_last_compressed(self):
+        return self.last_compressed
         
     def init_game(self):
         """Initialize state w/ random 2's
@@ -76,10 +79,12 @@ class BACKEND_2048():
     def compress_left(self):
         """Compresses duplicates"""
         # compress items.
-        compressed = 0
+        compressed = False
         self.last_reward = 0
+        self.last_compressed = 0
         for i in range(3):
             idxs = np.where(self.state[:,i]==self.state[:,i+1])[0]
+            self.last_compressed += len(idxs)
             non_zeros = np.where(self.state[idxs, i] != 0)[0]
             if len(non_zeros) == 0:
                 continue
@@ -92,15 +97,15 @@ class BACKEND_2048():
         # if somewhere was compressed, return True
         return compressed
 
-    def left(self):
+    def left(self, _=None):
         """Performs left operation in game"""
         stacked = self.stack_left()
-        if not self.compress_left() and not stacked: return self.INVALID
+        if not self.compress_left() and not stacked: return self.INVALID_MOVE
         self.stack_left()
         self.num_operations += 1
         self.spawn_tile()
         if self.check_game_over(): return self.GAME_OVER
-        return self.SUCCESS
+        return self.SUCCESSFUL_MOVE
         
     #############
     # Other ops #
@@ -113,37 +118,37 @@ class BACKEND_2048():
         """Transposes Matrix"""
         self.state = self.state.T
     
-    def right(self):
+    def right(self, _=None):
         """Performs Right operation"""
         # reverse to get left-equivalent op
         self.reverse()
         stacked = self.stack_left()
         if not self.compress_left() and not stacked: 
             self.reverse()
-            return self.INVALID
+            return self.INVALID_MOVE
         self.num_operations += 1
         self.stack_left()
         self.reverse()
         self.spawn_tile()
         if self.check_game_over(): return self.GAME_OVER
-        return self.SUCCESS
+        return self.SUCCESSFUL_MOVE
         
-    def up(self):
+    def up(self, _=None):
         """Performs Up operation"""
         # transpose to get left-equivalent op
         self.transpose()
         stacked = self.stack_left()
         if not self.compress_left() and not stacked:
             self.transpose()
-            return self.INVALID
+            return self.INVALID_MOVE
         self.num_operations += 1
         self.stack_left()
         self.transpose()
         self.spawn_tile()
         if self.check_game_over(): return self.GAME_OVER
-        return self.SUCCESS
+        return self.SUCCESSFUL_MOVE
         
-    def down(self):
+    def down(self, _=None):
         """Perform down operaion"""
         # Transpose & Reverse to get left-equivalent op
         self.transpose()
@@ -152,14 +157,14 @@ class BACKEND_2048():
         if not self.compress_left() and not stacked:
             self.reverse()
             self.transpose()
-            return self.INVALID
+            return self.INVALID_MOVE
         self.num_operations += 1
         self.stack_left()
         self.reverse()
         self.transpose()
         self.spawn_tile()
         if self.check_game_over(): return self.GAME_OVER
-        return self.SUCCESS
+        return self.SUCCESSFUL_MOVE
     
     ###################
     # Check Game Over #

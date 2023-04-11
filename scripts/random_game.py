@@ -1,7 +1,7 @@
 # File: random_game.py
 # File Created: Thursday, 9th March 2023 5:29:46 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Monday, 13th March 2023 1:29:42 am
+# Last Modified: Sunday, 2nd April 2023 5:36:36 am
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Plays a completely random game of 2048
@@ -20,7 +20,7 @@ if __name__ == '__main__':
         while not done:
             time.sleep(.01)
             action = env.random_action()
-            _, _, done = env.step(action)
+            _, _, done, _ = env.step(action)
     
     while True:
         pass
