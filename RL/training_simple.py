@@ -1,7 +1,7 @@
 # File: training_simple.py
 # File Created: Friday, 10th March 2023 10:24:44 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Monday, 10th April 2023 10:30:59 pm
+# Last Modified: Tuesday, 11th April 2023 12:33:57 am
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Training script for a simple DQN, repurposed from https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html

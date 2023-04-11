@@ -19,6 +19,8 @@ In my first solution, I took a Deep Q-Learning approach to solving 2048. The imp
 
 The first iteration model was only trained on 500 episodes, but I anticipate this to be an insufficient number of episodes. Future models will be trained longer.
 
+Training can be run using `python RL/training_simple'`. For a GUI version of training, change `gui = True` in line 269 to observe the training progress.
+
 ## Model
 
 The model I use is a simple MLP with 16 input neurons, 1024, 512, 256 hidden neurons, and 4 output neurons. The internal activations are ReLU operations and the output is just left linear. States are flatten to a 16 value vector to be fed into the model and each output neuron corresponds to the reward of a certain move. After doing research on other similar projects, this model is of sufficient size to capture the 2048 problem.
