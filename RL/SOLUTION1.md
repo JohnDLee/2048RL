@@ -14,7 +14,8 @@ The game is played until no successful move can be made.
 
 ## Training Method
 
-In my first solution, I took a Deep Q-Learning approach to solving 2048. The implementation of DQN can be found here [https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html]. Essentially, I try using the policy model to determine the reward of the next possible move, selecting the move that gives the largest possible reward. 
+In my first solution, I took a Deep Q-Learning approach to solving 2048. The implementation of DQN can be found [here](https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html). Essentially, I try using the policy model to determine the reward of the next possible move, selecting the move that gives the largest possible reward. 
+
 
 The first iteration model was only trained on 500 episodes, but I anticipate this to be an insufficient number of episodes. Future models will be trained longer.
 
@@ -32,7 +33,7 @@ For the loss function, I use the Huber Loss, because it take the best traits of 
 
 The training results over episodes is shown as follows. The main performance metric is the final score of the episode. On average, the score is slowly creeping up, around 800. However, it is hard to argue that this performance is any better than pure random strategy.
 
-[../trained_models/simpleDQN/train_results.png]
+![train_results](../trained_models/simpleDQN/train_results.png)
 
 The final run can be accomplished by running `python scripts/simpleDQN_game.py` and observing the results.
 
