@@ -46,6 +46,8 @@ class ENV2048():
         '''Reset the game'''
         if self.gui:
             self.game.reset_game()
+            # need to reassign backend
+            self.backend = self.game.backend
         else:
             del self.game
             self.game = BACKEND_2048()

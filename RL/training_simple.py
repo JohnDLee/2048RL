@@ -1,7 +1,7 @@
 # File: training_simple.py
 # File Created: Friday, 10th March 2023 10:24:44 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Wednesday, 12th April 2023 12:23:30 pm
+# Last Modified: Wednesday, 12th April 2023 12:36:09 pm
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Training script for a simple DQN, repurposed from https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
@@ -312,9 +312,10 @@ def main(args):
     
     
     # save dir
-    save_dir = Path('trained_models/simpleDQN' + args.eps)
-    p.mkdir(exist_ok = True, parents = True)
+    save_dir = Path('trained_models/simpleDQN' + str(args.eps))
+    save_dir.mkdir(exist_ok = True, parents = True)
     
+    print(args.plot)
     ## TRAINER
     # use default hyperparams
     trainer = TrainDQN(model=model,
@@ -322,7 +323,8 @@ def main(args):
                        loss_fn=loss_fn,
                        game_env=game_env,
                        device=device,
-                       save_dir=save_dir) 
+                       save_dir=save_dir,
+                       use_gui=args.plot) 
     
     trainer.optimize_model(args.eps)
     
@@ -331,7 +333,8 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = 'Training for DQN')
-    parser.add_argument("-gui", type = bool, action = 'store_true', default = False, help = 'Use the GUI to visualize results in real time. GUI will cause slowdowns and should not be used for actual training.')
+    parser.add_argument("-gui", action = 'store_true', default = False, help = 'Use the GUI to visualize results in real time. GUI will cause slowdowns and should not be used for actual training.')
+    parser.add_argument("-plot", action = 'store_true', default = False, help = 'Plot progression of results')
     parser.add_argument("-eps", type = int, default = 500, help = 'number of episodes to train for')
     
     args = parser.parse_args()
