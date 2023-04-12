@@ -178,7 +178,7 @@ class TrainDQN():
             state = torch.tensor(state, dtype=torch.float32, device=self.device).unsqueeze(0)
 
             for t in count():
-                print(state)
+                #print(state)
                 action = self.select_action(state)
                 observation, reward, terminated, info = self.game_env.step(action.item())
                 reward = torch.tensor([reward], device=self.device)
@@ -232,7 +232,7 @@ class TrainDQN():
             ax.plot(means.numpy())
 
         plt.pause(0.001)  # pause a bit so that plots are updated
-        fig.show()
+        #fig.show()
         return fig, ax
         
 Transition = namedtuple('Transition',
@@ -293,12 +293,12 @@ def main():
                        device=device,) 
     
     
-    trainer.optimize_model(500)
+    trainer.optimize_model(10000)
     
     trainer.plot_durations(trainer.fig, trainer.ax, show_result=True)
     
     # Save model
-    p = Path('trained_models/simpleDQN')
+    p = Path('trained_models/simpleDQN10000')
     p.mkdir(exist_ok = True, parents = True)
     
     torch.save(model.state_dict(), str(p / 'model_weights.pt'))
@@ -307,5 +307,5 @@ def main():
 
 if __name__ == '__main__':
     main()
-    while True:
-        pass
+    #while True:
+    #    pass
