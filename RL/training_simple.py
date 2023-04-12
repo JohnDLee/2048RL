@@ -1,7 +1,7 @@
 # File: training_simple.py
 # File Created: Friday, 10th March 2023 10:24:44 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Tuesday, 11th April 2023 12:33:57 am
+# Last Modified: Wednesday, 12th April 2023 12:23:30 pm
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Training script for a simple DQN, repurposed from https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
@@ -19,6 +19,7 @@ import copy
 from pathlib import Path
 import random
 import math
+import argparse
 
 
 
@@ -55,7 +56,7 @@ class SimpleDQN(nn.Module):
 
 class TrainDQN():
     
-    def __init__(self, model, optimizer, loss_fn, game_env, device, **kwargs):
+    def __init__(self, model, optimizer, loss_fn, game_env, device, save_dir, use_gui = False, **kwargs):
         
         ## HYPERPARAMS
         self.BATCH_SIZE = kwargs['BATCH_SIZE'] if 'BATCH_SIZE' in kwargs else 128 # batchsize for each training step
@@ -82,11 +83,20 @@ class TrainDQN():
         ## GAME ENV
         self.game_env = game_env
         
+        ## save dirs
+        self.save_dir = str(save_dir)
+        self.save_plot = str(Path(self.save_dir) / 'train_results.png')
+        self.save_weights = str(Path(self.save_dir) / 'model_weights.png')
+        
+        self.use_gui = use_gui
+        
         ## TRAIN INTERNALS
         self.steps_completed = 0
         self.episode_durations = []
         self.ax = None
         self.fig = None
+        
+    
     
     def select_action(self, state):
         # threshold computed based on decay
@@ -169,9 +179,10 @@ class TrainDQN():
         torch.nn.utils.clip_grad_value_(self.policy_model.parameters(), 100)
         self.optimizer.step()
             
-    def optimize_model(self, num_episodes):
+    def optimize_model(self, num_episodes, save_every = 100):
     
         for i_episode in range(num_episodes):
+            print(f"Episode {i_episode}/{num_episodes}", flush=True)
             # Initialize the environment and get it's state
             state = self.game_env.reset()
             # flatten as torch tensor to allow as input.
@@ -209,7 +220,21 @@ class TrainDQN():
                 if terminated:
                     self.episode_durations.append(self.game_env.backend.get_score())
                     self.fig, self.ax = self.plot_durations(self.fig, self.ax, False)
+                    # save every so often.
+                    if i_episode % save_every == 0:
+                        self.save_results()
+                        
                     break
+                
+        self.plot_durations(self.fig, self.ax, show_result=True)
+        self.save_results()
+        
+        
+    def save_results(self):
+        ''' save results '''
+        torch.save(self.policy_model.state_dict(), self.save_weights)
+        self.fig.savefig(self.save_plot)
+        
         
     def plot_durations(self, fig=None, ax: plt.Axes=None, show_result=False):
         if not fig:
@@ -232,7 +257,8 @@ class TrainDQN():
             ax.plot(means.numpy())
 
         plt.pause(0.001)  # pause a bit so that plots are updated
-        #fig.show()
+        if self.use_gui:
+            fig.show()
         return fig, ax
         
 Transition = namedtuple('Transition',
@@ -260,13 +286,13 @@ class ReplayMemory():
 
         
         
-def main():
+def main(args):
         
     # use GPU if available
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     ## GAME ENVIRONMENT
-    game_env = ENV2048(gui = False)
+    game_env = ENV2048(gui = args.gui)
     
     ## GAME OPTIONS/STATE
     # get number of actions and state size
@@ -284,28 +310,32 @@ def main():
                             )
     loss_fn = nn.HuberLoss()
     
+    
+    # save dir
+    save_dir = Path('trained_models/simpleDQN' + args.eps)
+    p.mkdir(exist_ok = True, parents = True)
+    
     ## TRAINER
     # use default hyperparams
     trainer = TrainDQN(model=model,
                        optimizer=optimizer,
                        loss_fn=loss_fn,
                        game_env=game_env,
-                       device=device,) 
+                       device=device,
+                       save_dir=save_dir) 
+    
+    trainer.optimize_model(args.eps)
     
     
-    trainer.optimize_model(10000)
     
-    trainer.plot_durations(trainer.fig, trainer.ax, show_result=True)
-    
-    # Save model
-    p = Path('trained_models/simpleDQN10000')
-    p.mkdir(exist_ok = True, parents = True)
-    
-    torch.save(model.state_dict(), str(p / 'model_weights.pt'))
-    trainer.fig.savefig(str(p/'train_results.png'))
-
 
 if __name__ == '__main__':
-    main()
-    #while True:
-    #    pass
+    parser = argparse.ArgumentParser(description = 'Training for DQN')
+    parser.add_argument("-gui", type = bool, action = 'store_true', default = False, help = 'Use the GUI to visualize results in real time. GUI will cause slowdowns and should not be used for actual training.')
+    parser.add_argument("-eps", type = int, default = 500, help = 'number of episodes to train for')
+    
+    args = parser.parse_args()
+    main(args)
+    if args.gui:
+        while True:
+           pass
