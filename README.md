@@ -1,4 +1,6 @@
 # 2048RL
+Author: John Lee
+
 Deep Reinforcement Learning Model to play 2048
 
 

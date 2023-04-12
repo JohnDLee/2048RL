@@ -26,6 +26,24 @@ class ENV2048():
         ''' gives a random action to do '''
         return np.random.randint(4) # 0 - 3
     
+    def pseudo_step(self, action):
+        """Takes a pseudo step
+        """
+        # save previous state
+        cur_state = self.backend.get_state()
+        cur_score = self.backend.get_score()
+        num_vals = self.backend.num_vals
+        
+        results = self.step(action)
+        # reload it back
+        self.backend.state = cur_state
+        self.backend.score = cur_score
+        self.backend.num_vals = num_vals
+        self.backend.num_operations -= 1
+        return results
+        
+        
+    
     def step(self, action):
         ''' takes an action,
         returns (next_state, reward, game_over)'''
