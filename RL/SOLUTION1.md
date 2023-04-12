@@ -19,7 +19,7 @@ In my first solution, I took a Deep Q-Learning approach to solving 2048. The imp
 
 The first iteration model was only trained on 500 episodes, but I anticipate this to be an insufficient number of episodes. Future models will be trained longer.
 
-Training can be run using `python RL/training_simple'`. For a GUI version of training, change `gui = True` in line 269 to observe the training progress.
+Training can be run using `python RL/training_simple [-gui] [-plot] [-eps N]` to train with GUI on or off and plotting.
 
 ## Model
 
@@ -35,9 +35,9 @@ For the loss function, I use the Huber Loss, because it take the best traits of 
 
 The training results over episodes is shown as follows. The main performance metric is the final score of the episode. On average, the score is slowly creeping up, around 800. However, it is hard to argue that this performance is any better than pure random strategy.
 
-![train_results](../trained_models/simpleDQN/train_results.png)
+![train_results](../trained_models/simpleDQN500/train_results.png)
 
-The final run can be accomplished by running `python scripts/simpleDQN_game.py` and observing the results.
+The final run can be accomplished by running `python scripts/simpleDQN500_game.py` and observing the results.
 
 
 ## Improvement
