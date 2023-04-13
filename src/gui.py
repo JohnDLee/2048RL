@@ -1,7 +1,7 @@
 # File: gui.py
 # File Created: Friday, 10th February 2023 2:48:41 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Monday, 10th April 2023 10:15:39 pm
+# Last Modified: Thursday, 13th April 2023 7:19:04 pm
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Contains GUI Class for 2048 in python
@@ -10,7 +10,7 @@
 import tkinter as tk
 from collections import defaultdict
 from .backend import BACKEND_2048
-
+import time
 
 
 class GAME_2048(tk.Frame):
@@ -117,11 +117,10 @@ class GAME_2048(tk.Frame):
                 for cell_data in row:
                     cell_data['frame'].destroy()
             
-        # create gui
-        self.GUI_maker()
-        
         # backend, start game
         self.backend = BACKEND_2048()
+        # create gui
+        self.GUI_maker()
         self.GUI_update()
         
     def run_interactive_game(self):
@@ -190,83 +189,43 @@ class GAME_2048(tk.Frame):
 
     def left(self, event):
         """Left op"""
-        stacked = self.backend.stack_left()
-        if not self.backend.compress_left() and not stacked:
-            return self.INVALID_MOVE
-        self.backend.stack_left()
-        # spawn a new tile
-        self.backend.spawn_tile()
-        # update GUI
-        self.GUI_update()
-        # check game over
-        if self.backend.check_game_over():
-            self.game_over()
-            return self.GAME_OVER
-        return self.SUCCESSFUL_MOVE
-            
-    def right(self, event):
-        """Right op"""
-        # Convert to left-equiv
-        self.backend.reverse()
-        stacked = self.backend.stack_left()
-        if not self.backend.compress_left() and not stacked:
-            self.backend.reverse()
-            return self.INVALID_MOVE
-        self.backend.stack_left()
-        self.backend.reverse()
-        # spawn tile
-        self.backend.spawn_tile()
-        # update Gui
-        self.GUI_update()
-        # check game over
-        if self.backend.check_game_over():
-            self.game_over()
-            return self.GAME_OVER
-        return self.SUCCESSFUL_MOVE
-        
-    def up(self, event):
-        """Up op"""
-        # convert to left-equiv
-        self.backend.transpose()
-        stacked = self.backend.stack_left()
-        if not self.backend.compress_left() and not stacked:
-            self.backend.transpose()
-            return self.INVALID_MOVE
-        self.backend.stack_left()
-        self.backend.transpose()
-        # spawn tile
-        self.backend.spawn_tile()
+        result = self.backend.left()
         # update GUI
         self.GUI_update()
         # check Game over
-        if self.backend.check_game_over():
+        if result == self.backend.GAME_OVER: 
             self.game_over() 
-            return self.GAME_OVER
-        return self.SUCCESSFUL_MOVE
+        return result
+            
+    def right(self, event):
+        """Right op"""
+        result = self.backend.right()
+        # update GUI
+        self.GUI_update()
+        # check Game over
+        if result == self.backend.GAME_OVER: 
+            self.game_over() 
+        return result
+        
+    def up(self, event):
+        """Up op"""
+        result = self.backend.up()
+        # update GUI
+        self.GUI_update()
+        # check Game over
+        if result == self.backend.GAME_OVER: 
+            self.game_over() 
+        return result
             
     def down(self, event):
         """Down op"""
-        # convert to left-equivalent
-        self.backend.transpose()
-        self.backend.reverse()
-        stacked = self.backend.stack_left()
-        if not self.backend.compress_left() and not stacked:
-            self.backend.reverse()
-            self.backend.transpose()
-            return self.INVALID_MOVE
-        self.backend.stack_left()
-        self.backend.reverse()
-        self.backend.transpose()
-        
-        # spawn tile
-        self.backend.spawn_tile()
+        result = self.backend.down()
         # update gui
         self.GUI_update()
         # check game over
-        if self.backend.check_game_over(): 
+        if result == self.backend.GAME_OVER: 
             self.game_over() 
-            return self.GAME_OVER
-        return self.SUCCESSFUL_MOVE
+        return result
     
     
     def game_over(self):
@@ -302,4 +261,4 @@ class GAME_2048(tk.Frame):
                         text=str(cell_value)
                     )
         self.label_score.configure(text=self.backend.get_score())
-        self.update_idletasks()
+        self.update()

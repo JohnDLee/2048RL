@@ -1,7 +1,7 @@
 # File: simplemlp_game.py
 # File Created: Friday, 10th March 2023 10:16:19 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Wednesday, 12th April 2023 12:37:05 pm
+# Last Modified: Thursday, 13th April 2023 7:54:52 pm
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Plays a game using a trained SimpleMLP model
@@ -19,7 +19,7 @@ from RL.training_simple import SimpleDQN
 if __name__ == '__main__':
     
     # dqn path
-    dqn = Path("trained_models/simpleDQN500")
+    dqn = Path("trained_models/simpleDQN10000")
     
     # device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     model = model.to(device)
     
     # game env
-    env = ENV2048()
+    env = ENV2048(gui = True)
     state = env.reset()
     state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
     
@@ -42,13 +42,13 @@ if __name__ == '__main__':
             
             if random:
                 # Random move if previous was an invalid move
-                state, reward, terminated, info = env.step(env.random_action())
+                state, reward, terminated, info = env.gui_step(env.random_action())
                 random = False
             else:
                 # Use best move
                 scores = model(state)
                 action = scores.argmax()
-                state, reward, terminated, info = env.step(action.item())
+                state, reward, terminated, info = env.gui_step(action.item())
             
             
             if info == env.game.INVALID_MOVE:

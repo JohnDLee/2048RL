@@ -1,7 +1,7 @@
 # File: training_simple.py
 # File Created: Friday, 10th March 2023 10:24:44 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Wednesday, 12th April 2023 12:36:09 pm
+# Last Modified: Thursday, 13th April 2023 7:43:24 pm
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Training script for a simple DQN, repurposed from https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
@@ -56,7 +56,7 @@ class SimpleDQN(nn.Module):
 
 class TrainDQN():
     
-    def __init__(self, model, optimizer, loss_fn, game_env, device, save_dir, use_gui = False, **kwargs):
+    def __init__(self, model, optimizer, loss_fn, game_env, device, save_dir, **kwargs):
         
         ## HYPERPARAMS
         self.BATCH_SIZE = kwargs['BATCH_SIZE'] if 'BATCH_SIZE' in kwargs else 128 # batchsize for each training step
@@ -82,13 +82,12 @@ class TrainDQN():
         
         ## GAME ENV
         self.game_env = game_env
+        self.game_step = game_env.gui_step if game_env.gui else game_env.step
         
         ## save dirs
         self.save_dir = str(save_dir)
         self.save_plot = str(Path(self.save_dir) / 'train_results.png')
-        self.save_weights = str(Path(self.save_dir) / 'model_weights.png')
-        
-        self.use_gui = use_gui
+        self.save_weights = str(Path(self.save_dir) / 'model_weights.pt')
         
         ## TRAIN INTERNALS
         self.steps_completed = 0
@@ -191,7 +190,7 @@ class TrainDQN():
             for t in count():
                 #print(state)
                 action = self.select_action(state)
-                observation, reward, terminated, info = self.game_env.step(action.item())
+                observation, reward, terminated, info = self.game_step(action.item())
                 reward = torch.tensor([reward], device=self.device)
                 
 
@@ -257,8 +256,7 @@ class TrainDQN():
             ax.plot(means.numpy())
 
         plt.pause(0.001)  # pause a bit so that plots are updated
-        if self.use_gui:
-            fig.show()
+        fig.show()
         return fig, ax
         
 Transition = namedtuple('Transition',
@@ -315,7 +313,6 @@ def main(args):
     save_dir = Path('trained_models/simpleDQN' + str(args.eps))
     save_dir.mkdir(exist_ok = True, parents = True)
     
-    print(args.plot)
     ## TRAINER
     # use default hyperparams
     trainer = TrainDQN(model=model,
@@ -323,8 +320,7 @@ def main(args):
                        loss_fn=loss_fn,
                        game_env=game_env,
                        device=device,
-                       save_dir=save_dir,
-                       use_gui=args.plot) 
+                       save_dir=save_dir) 
     
     trainer.optimize_model(args.eps)
     
@@ -334,7 +330,6 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = 'Training for DQN')
     parser.add_argument("-gui", action = 'store_true', default = False, help = 'Use the GUI to visualize results in real time. GUI will cause slowdowns and should not be used for actual training.')
-    parser.add_argument("-plot", action = 'store_true', default = False, help = 'Plot progression of results')
     parser.add_argument("-eps", type = int, default = 500, help = 'number of episodes to train for')
     
     args = parser.parse_args()

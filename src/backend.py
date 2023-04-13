@@ -1,7 +1,7 @@
 # File: backend.py
 # File Created: Friday, 10th February 2023 2:48:38 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Monday, 10th April 2023 10:28:55 pm
+# Last Modified: Thursday, 13th April 2023 5:46:30 pm
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Backend for the 2048 game for quick interactions in RL
@@ -97,7 +97,7 @@ class BACKEND_2048():
         # if somewhere was compressed, return True
         return compressed
 
-    def left(self, _=None):
+    def left(self,):
         """Performs left operation in game"""
         stacked = self.stack_left()
         if not self.compress_left() and not stacked: return self.INVALID_MOVE
@@ -118,7 +118,7 @@ class BACKEND_2048():
         """Transposes Matrix"""
         self.state = self.state.T
     
-    def right(self, _=None):
+    def right(self):
         """Performs Right operation"""
         # reverse to get left-equivalent op
         self.reverse()
@@ -133,7 +133,7 @@ class BACKEND_2048():
         if self.check_game_over(): return self.GAME_OVER
         return self.SUCCESSFUL_MOVE
         
-    def up(self, _=None):
+    def up(self):
         """Performs Up operation"""
         # transpose to get left-equivalent op
         self.transpose()
@@ -148,7 +148,7 @@ class BACKEND_2048():
         if self.check_game_over(): return self.GAME_OVER
         return self.SUCCESSFUL_MOVE
         
-    def down(self, _=None):
+    def down(self):
         """Perform down operaion"""
         # Transpose & Reverse to get left-equivalent op
         self.transpose()

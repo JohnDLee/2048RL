@@ -1,7 +1,7 @@
 # File: training_simple.py
 # File Created: Friday, 10th March 2023 10:24:44 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Wednesday, 12th April 2023 12:36:09 pm
+# Last Modified: Thursday, 13th April 2023 7:48:58 pm
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Training script for a simple DQN, repurposed from https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
@@ -56,7 +56,7 @@ class SimpleDQN(nn.Module):
 
 class TrainDQN():
     
-    def __init__(self, model, optimizer, loss_fn, game_env, device, save_dir, use_gui = False, **kwargs):
+    def __init__(self, model, optimizer, loss_fn, game_env, device, save_dir, **kwargs):
         
         ## HYPERPARAMS
         self.BATCH_SIZE = kwargs['BATCH_SIZE'] if 'BATCH_SIZE' in kwargs else 128 # batchsize for each training step
@@ -82,13 +82,12 @@ class TrainDQN():
         
         ## GAME ENV
         self.game_env = game_env
+        self.game_step = game_env.gui_step if game_env.gui else game_env.step
         
         ## save dirs
         self.save_dir = str(save_dir)
         self.save_plot = str(Path(self.save_dir) / 'train_results.png')
         self.save_weights = str(Path(self.save_dir) / 'model_weights.png')
-        
-        self.use_gui = use_gui
         
         ## TRAIN INTERNALS
         self.steps_completed = 0
@@ -131,13 +130,17 @@ class TrainDQN():
         
         # Compute a mask of non-final states and concatenate the batch elements
         # (a final state would've been the one after which simulation ended)
-        non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
-                                            batch.next_state)), device=self.device, dtype=torch.bool)
-        non_final_next_states = torch.cat([s for s in batch.next_state
+        
+        # handle multiple elements for each
+        non_final_mask = torch.vstack(tuple(map(lambda x: torch.tensor(tuple(map(lambda s: s is not None,
+                                            x)), device=self.device, dtype=torch.bool),
+                                            batch.next_state)))
+        
+        non_final_next_states = torch.cat([s for row in batch.next_state for s in row
                                                     if s is not None])
         state_batch = torch.cat(batch.state)
-        action_batch = torch.cat(batch.action)
-        reward_batch = torch.cat(batch.reward)
+        action_batch = torch.vstack(batch.action)
+        reward_batch = torch.vstack(batch.reward)
         
         # print("state:", state_batch)
         # print("action_batch:", action_batch)
@@ -161,17 +164,18 @@ class TrainDQN():
         # on the "older" target_net; selecting their best reward with max(1)[0].
         # This is merged based on the mask, such that we'll have either the expected
         # state value or 0 in case the state was final.
-        next_state_values = torch.zeros(self.BATCH_SIZE, device=self.device)
+        #! 4 is specifically for actions
+        next_state_values = torch.zeros((self.BATCH_SIZE, len(action_batch[0])), device=self.device)
         with torch.no_grad():
             next_state_values[non_final_mask] = self.target_model(non_final_next_states).max(1)[0]
+            
         # Compute the expected Q values
         expected_state_action_values = (next_state_values * self.GAMMA) + reward_batch
        
         #print(state_action_values, expected_state_action_values)
 
         # Compute Huber loss
-
-        loss = self.loss_fn(state_action_values, expected_state_action_values.unsqueeze(1))
+        loss = self.loss_fn(state_action_values, expected_state_action_values)
         # Optimize the model
         self.optimizer.zero_grad()
         loss.backward()
@@ -189,22 +193,33 @@ class TrainDQN():
             state = torch.tensor(state, dtype=torch.float32, device=self.device).unsqueeze(0)
 
             for t in count():
-                #print(state)
-                action = self.select_action(state)
-                observation, reward, terminated, info = self.game_env.step(action.item())
-                reward = torch.tensor([reward], device=self.device)
                 
+                # observe every action using a pseudo step
+                rewards = []
+                next_states = []
+                for a_idx in range(self.game_env.num_actions()):
+                
+                    observation, reward, terminated, info = self.game_env.pseudo_step(a_idx)
+                    rewards.append(reward)
 
-                if terminated:
-                    next_state = None
-                else:
-                    next_state = torch.tensor(observation, dtype=torch.float32, device=self.device).unsqueeze(0)
-
+                    if terminated:
+                        next_state = None
+                    else:
+                        next_state = torch.tensor(observation, dtype=torch.float32, device=self.device).unsqueeze(0)
+                    next_states.append(next_state)
+                # take real step
+                action = self.select_action(state)
+                observation, reward, terminated, info = self.game_step(action.item())
+                    
+                # store transition in memory   
+                rewards = torch.tensor(rewards, device=self.device)
+                
+                actions = torch.tensor([range(self.game_env.num_actions())])
                 # Store the transition in memory
-                self.memory.push(state, action, next_state, reward)
+                self.memory.push(state, actions, next_states, rewards)
 
                 # Move to the next state
-                state = next_state
+                state = torch.tensor(observation, dtype=torch.float32, device=self.device).unsqueeze(0) if not terminated else None
 
                 # Perform one step of the optimization (on the policy network)
                 self.optimize_model_step()
@@ -223,7 +238,6 @@ class TrainDQN():
                     # save every so often.
                     if i_episode % save_every == 0:
                         self.save_results()
-                        
                     break
                 
         self.plot_durations(self.fig, self.ax, show_result=True)
@@ -257,8 +271,7 @@ class TrainDQN():
             ax.plot(means.numpy())
 
         plt.pause(0.001)  # pause a bit so that plots are updated
-        if self.use_gui:
-            fig.show()
+        fig.show()
         return fig, ax
         
 Transition = namedtuple('Transition',
@@ -312,10 +325,9 @@ def main(args):
     
     
     # save dir
-    save_dir = Path('trained_models/simpleDQN' + str(args.eps))
+    save_dir = Path('trained_models/everyDQN' + str(args.eps))
     save_dir.mkdir(exist_ok = True, parents = True)
     
-    print(args.plot)
     ## TRAINER
     # use default hyperparams
     trainer = TrainDQN(model=model,
@@ -323,8 +335,7 @@ def main(args):
                        loss_fn=loss_fn,
                        game_env=game_env,
                        device=device,
-                       save_dir=save_dir,
-                       use_gui=args.plot) 
+                       save_dir=save_dir) 
     
     trainer.optimize_model(args.eps)
     
@@ -334,7 +345,6 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = 'Training for DQN')
     parser.add_argument("-gui", action = 'store_true', default = False, help = 'Use the GUI to visualize results in real time. GUI will cause slowdowns and should not be used for actual training.')
-    parser.add_argument("-plot", action = 'store_true', default = False, help = 'Plot progression of results')
     parser.add_argument("-eps", type = int, default = 500, help = 'number of episodes to train for')
     
     args = parser.parse_args()
