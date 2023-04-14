@@ -1,7 +1,7 @@
 # File: training_simple.py
 # File Created: Friday, 10th March 2023 10:24:44 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Thursday, 13th April 2023 10:06:29 pm
+# Last Modified: Friday, 14th April 2023 10:39:16 am
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Training script for a simple DQN, repurposed from https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
@@ -86,7 +86,7 @@ class TrainDQN():
         
         ## save dirs
         self.save_dir = str(save_dir)
-        self.save_plot = str(Path(self.save_dir) / 'train_results.png')
+        self.save_plot = str(Path(self.save_dir) / 'train_results.pt')
         self.save_weights = str(Path(self.save_dir) / 'model_weights.png')
         
         ## TRAIN INTERNALS

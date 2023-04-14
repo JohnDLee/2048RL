@@ -1,7 +1,7 @@
 # File: simplemlp_game.py
 # File Created: Friday, 10th March 2023 10:16:19 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Friday, 14th April 2023 10:40:54 am
+# Last Modified: Friday, 14th April 2023 10:40:46 am
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Plays a game using a trained SimpleMLP model
@@ -19,7 +19,7 @@ from RL.training_simple import SimpleDQN
 if __name__ == '__main__':
     
     # dqn path
-    dqn = Path("trained_models/simpleDQN10000")
+    dqn = Path("trained_models/everyDQN10000")
     
     # device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
