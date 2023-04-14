@@ -1,7 +1,7 @@
 # File: training_simple.py
 # File Created: Friday, 10th March 2023 10:24:44 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Thursday, 13th April 2023 8:10:25 pm
+# Last Modified: Thursday, 13th April 2023 10:06:29 pm
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Training script for a simple DQN, repurposed from https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
@@ -214,7 +214,7 @@ class TrainDQN():
                 # store transition in memory   
                 rewards = torch.tensor(rewards, device=self.device)
                 
-                actions = torch.tensor([range(self.game_env.num_actions())], dtype=torch.float32, device=self.device)
+                actions = torch.tensor([range(self.game_env.num_actions())], device=self.device)
                 # Store the transition in memory
                 self.memory.push(state, actions, next_states, rewards)
 
