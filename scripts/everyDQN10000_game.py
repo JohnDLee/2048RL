@@ -1,7 +1,7 @@
 # File: simplemlp_game.py
 # File Created: Friday, 10th March 2023 10:16:19 pm
 # Author: John Lee (jlee88@nd.edu)
-# Last Modified: Friday, 14th April 2023 10:40:46 am
+# Last Modified: Friday, 14th April 2023 10:49:32 am
 # Modified By: John Lee (jlee88@nd.edu>)
 # 
 # Description: Plays a game using a trained SimpleMLP model
@@ -41,6 +41,7 @@ if __name__ == '__main__':
             # get action
             
             if random:
+                print("Random")
                 # Random move if previous was an invalid move
                 state, reward, terminated, info = env.gui_step(env.random_action())
                 random = False
