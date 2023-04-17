@@ -19,7 +19,7 @@ In my first solution, I took a Deep Q-Learning approach to solving 2048. The imp
 
 The first iteration model was only trained on 500 episodes, but I anticipate this to be an insufficient number of episodes. Future models will be trained longer.
 
-Training can be run using `python RL/training_simple [-gui] [-plot] [-eps N]` to train with GUI on or off and plotting.
+Training can be run using `python RL/training_simple [-gui] [-eps N]` to train with GUI on or off and plotting.
 
 ## Model
 
