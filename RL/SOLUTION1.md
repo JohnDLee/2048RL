@@ -42,11 +42,9 @@ The loss profile is as follows:
 
 
 
-I also ran 1000 simulations of the game and observed some statistics regarding the final reward, the total moves, and the top tile score reached.
-
+I ran 1000 test simulations of the game and the results are below.
 ![test_results](../results/RMT_simple1000.png)
 
-![test_summary](../results/STATS_simple1000.png)
 
 | Metric | Mean | Std | Min | Max |
 | ------ | ---- | --- | --- | --- |
@@ -65,13 +63,26 @@ I also ran 1000 simulations of the game and observed some statistics regarding t
 
 ### Random
 
-We can actually compare it to a random strategy and see that it does worse.
+We can actually compare it to a random strategy and see that it actually does worse.
 
 Using a 1000 simulations of the game, the statistics are as follows:
 
 ![random_results](../results/RMT_random.png)
 
+| Metric | Mean | Std | Min | Max |
+| ------ | ---- | --- | --- | --- |
+| Score  | 909.85 | 362.11 | 40 | 2884 | 
+| Moves  | 84.03 | 27.77 | 20 | 193 | 
+| Top Squares | - | - | 8 | 256 | 
 
+| Value | Counts |
+| ----- | ------ | 
+| 8 | 1 | 
+| 16 | 3 | 
+| 32 | 97 | 
+| 64 | 434 | 
+| 128 | 407 | 
+| 256 | 58 |
 
 
 ## Running using the Trained Model
