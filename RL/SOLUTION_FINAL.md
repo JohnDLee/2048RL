@@ -4,6 +4,10 @@
 
 The environment is set up the exact same way as in [solution1](SOLUTION1.md), with 1 minor change. I include a new option to take a pseudo-step, which outputs the associated next_state and reward for a certain action, but doesn't actually make a modification to the true game state. This enables us to observe the expected result of EVERY action (up, down, left, right) for a single state.
 
+## Model
+
+The model is also identical to the one proposed in [solution1](SOLUTION1.md)
+
 ## Improvements Upon Solution 1.
 
 The main improvement from solution 1 is the implementation of a new training method. Previously, I noticed that only taking the reward associated witht the action selected using an epsilon-greedy algorith, the model could not learn at all. This is likely due to the fact that there are a significant number of state configurations, and only updating the policy network with the selected action meant the policy wasn't actually learning to distinguish what the optimal move was. Or if it was, it wasn't converging fast enough. The outputs of the policy network were always roughly the same. Furthermore, if an invalid move was made for a particular state, all the outputted rewards associated with that state would end up negative, similar to the previous noted case.
@@ -99,4 +103,25 @@ Using a 1000 simulations of the game, the statistics are as follows:
 ### Human-Played game
 Here is my best run at a human-played game of 2048.
 
+![human_game](../results/Human_Game.png)
 
+The score I got is comparable to the top scores of the RL agent.
+
+## Running Tests
+
+Any of the tests can be run in GUI mode using the following commands.
+
+1. Run `python scripts/interactive_game.py` for the interactive game
+2. Run `python scripts/random_game.py` for a game using randomly selected moves
+3. Run `python scripts/simpleDQN10000_game.py` for a game using the first iteration of the DQN, trained using the original DQN algorithm for 10k episodes
+4. Run `python scripts/everyDQN10000_game.py` for a game using the DQN trained by taking all 4 transitions for a particular state for 10k episodes.
+5. Run `python scripts/everyDQN100000_game.py` for the final version of the DQN, trained using the same method as 4. but with 100k episodes.
+
+
+## Further Improvement
+
+There are a couple options for improvement of the RL algorithm. Although I didn't attempt a different architecture, it may be the case that a CNN or other hyperparameters might result in performance improvements. My choice of an MLP of that size is an arbitrary selection.
+
+Another improvement could be made upon this final iteration of the solution. Rather than just perform 1 of each action, it may be worth it to perform a Monte Carlo sample of each action. This is because although the reward $r$ will still be the same, the next state $V(s')$ may differ. Taking an average of $V(s')$ could improve convergence. However, the space complexity would drastically increase.
+
+To extend this improvement further and have it make more sense, we could do a Monte Carlo Tree search of depth 2 or more. Although the $r$ values of depth 1 is the same, since the next-state is probabilistic, doing a depth 2 would offer different rewards for the 2nd action. However, once again there is a significant tradeoff in space complexity and the time consumed for each iteration.
