@@ -33,6 +33,7 @@ For the loss function, I use the Huber Loss, because it take the best traits of 
 
 ## Results
 
+### Simple DQN
 The training results over episodes is shown as follows. The main performance metric is the final score of the episode. While the score creeps up initially, around 800, we see that it drops and doesn't proceed to learn. 
 
 The loss profile is as follows:
@@ -47,7 +48,7 @@ I also ran 1000 simulations of the game and observed some statistics regarding t
 
 ![test_summary](../results/STATS_simple1000.png)
 
-
+### Random
 We can actually compare it to a random strategy and see that it literally does worse.
 
 
