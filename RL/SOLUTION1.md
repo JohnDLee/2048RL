@@ -48,10 +48,9 @@ I also ran 1000 simulations of the game and observed some statistics regarding t
 
 ![test_summary](../results/STATS_simple1000.png)
 
-| Syntax | Description |
-| --- | ----------- |
-| Header | Title |
-| Paragraph | Text |
+| Metric | Mean | Std | Min | Max |
+| ------ | ---- | --- | --- | --- |
+| Score  | 558.96 | 362.11 | 36 | 2568 | 
 
 ### Random
 
