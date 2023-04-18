@@ -33,7 +33,9 @@ For the loss function, I use the Huber Loss, because it take the best traits of 
 
 ## Results
 
-The training results over episodes is shown as follows. The main performance metric is the final score of the episode. While the score creeps up initially, around 800, we see that it drops and doesn't proceed to learn. It is hard to argue that this performance is any better than pure random strategy.
+The training results over episodes is shown as follows. The main performance metric is the final score of the episode. While the score creeps up initially, around 800, we see that it drops and doesn't proceed to learn. 
+
+The loss profile is as follows:
 
 ![train_loss_profile](../trained_models/simpleDQN10000/train_results.png)
 
@@ -44,6 +46,11 @@ I also ran 1000 simulations of the game and observed some statistics regarding t
 ![test_results](../results/RMT_simple1000.png)
 
 ![test_summary](../results/STATS_simple1000.png)
+
+
+We can actually compare it to a random strategy and see that it literally does worse.
+
+
 
 
 ## Improvement
