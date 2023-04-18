@@ -5,6 +5,7 @@ setup(
     packages=find_packages(),
     install_requires = [
         'numpy >= 1.22.3',
-        'matplotlib <= 3.7.1'
-        'tqdm'
+        'matplotlib <= 3.7.1',
+        'tqdm',
+        'torch'
     ])
