@@ -40,7 +40,7 @@ The loss profile is as follows:
 
 ![train_loss_profile](../trained_models/simpleDQN10000/train_results.png)
 
-The test run can be accomplished by running `python scripts/simpleDQN10000_game.py` and observing the results.
+
 
 I also ran 1000 simulations of the game and observed some statistics regarding the final reward, the total moves, and the top tile score reached.
 
@@ -48,11 +48,28 @@ I also ran 1000 simulations of the game and observed some statistics regarding t
 
 ![test_summary](../results/STATS_simple1000.png)
 
+| Syntax | Description |
+| --- | ----------- |
+| Header | Title |
+| Paragraph | Text |
+
 ### Random
-We can actually compare it to a random strategy and see that it literally does worse.
+
+We can actually compare it to a random strategy and see that it does worse.
+
+Using a 1000 simulations of the game, the statistics are as follows:
+
+![random_results](../results/RMT_random.png)
 
 
 
+
+## Running using the Trained Model
+
+A Monte-Carlo simulation of 1000 test runs can be observed in the notebook at `RL/evaluate_performance.ipynb`.
+
+The test run using the trained model can be accomplished by running `python scripts/simpleDQN10000_game.py`.
+A test run using a random policy can be accomplished by running `python scripts/random_game.py`.
 
 ## Improvement
 
