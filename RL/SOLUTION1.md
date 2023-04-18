@@ -51,6 +51,17 @@ I also ran 1000 simulations of the game and observed some statistics regarding t
 | Metric | Mean | Std | Min | Max |
 | ------ | ---- | --- | --- | --- |
 | Score  | 558.96 | 362.11 | 36 | 2568 | 
+| Moves  | 62.91 | 23.78 | 19 | 163 | 
+| Top Squares | - | - | 8 | 256 | 
+
+| Value | Counts |
+| ----- | ------ | 
+| 8 | 1 | 
+| 16 | 82 | 
+| 32 | 358 | 
+| 64 | 417 | 
+| 128 | 134 | 
+| 256 | 8 |
 
 ### Random
 
