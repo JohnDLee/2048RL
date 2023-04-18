@@ -33,7 +33,7 @@ For the loss function, I use the Huber Loss, because it take the best traits of 
 
 ## Results
 
-The training results over episodes is shown as follows. The main performance metric is the final score of the episode. On average, the score is slowly creeping up, around 800. However, it is hard to argue that this performance is any better than pure random strategy.
+The training results over episodes is shown as follows. The main performance metric is the final score of the episode. While the score creeps up initially, around 800, we see that it drops and doesn't proceed to learn. It is hard to argue that this performance is any better than pure random strategy.
 
 ![train_loss_profile](../trained_models/simpleDQN10000/train_results.png)
 
