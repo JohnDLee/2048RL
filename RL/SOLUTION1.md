@@ -35,9 +35,15 @@ For the loss function, I use the Huber Loss, because it take the best traits of 
 
 The training results over episodes is shown as follows. The main performance metric is the final score of the episode. On average, the score is slowly creeping up, around 800. However, it is hard to argue that this performance is any better than pure random strategy.
 
-![train_results](../trained_models/simpleDQN500/train_results.png)
+![train_loss_profile](../trained_models/simpleDQN500/train_results.png)
 
 The final run can be accomplished by running `python scripts/simpleDQN500_game.py` and observing the results.
+
+I also ran 1000 simulations of the game and observed some statistics regarding the final reward, the total moves, and the top tile score reached.
+
+![test_results](../results/RMT_simple1000.png)
+
+![test_summary](../results/STATS_simple1000.png)
 
 
 ## Improvement
